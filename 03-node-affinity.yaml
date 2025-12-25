@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+## these are replicaset labels
+  labels:
+    purpose: taint-demo
+    project: roboshop
+spec:
+  replicas: 1
+  selector:
+  ## these labels sre used to select the pods
+    matchLabels:
+      purpose: taint-demo
+      project: roboshop
+  
+### pod definition
+  template:
+    metadata:
+      labels:
+        purpose: taint-demo
+        project: roboshop
+    
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: topology.kubernetes.io/zone
+                operator: In
+                values:
+                - us-east-1b
+      containers:
+      - name: nginx
+        image: nginx
+        imagePullPolicy: Always
